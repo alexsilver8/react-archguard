@@ -5,12 +5,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { checkComponentFile } from './rules.js';
-import {
-    findComponentFiles,
-    formatViolations,
-    parseCheckOptions,
-    toRelativePath,
-} from './utils.js';
+import { findComponentFiles, toRelativePath } from './utils.js';
 import type { ArchitectureViolation, CheckOptions } from './types.js';
 
 export function runCheck(options: CheckOptions): ArchitectureViolation[] {
@@ -34,22 +29,4 @@ export function runCheck(options: CheckOptions): ArchitectureViolation[] {
     }
 
     return violations;
-}
-
-function main(): void {
-    const options: CheckOptions = parseCheckOptions(process.argv.slice(2), process.cwd());
-    const componentFiles: string[] = findComponentFiles(options.projectRoot, options.componentRoots);
-    const violations: ArchitectureViolation[] = runCheck(options);
-
-    if (violations.length > 0) {
-        console.error(formatViolations(violations));
-        process.exitCode = 1;
-        return;
-    }
-
-    console.log(`✓ ${componentFiles.length} component file${componentFiles.length === 1 ? '' : 's'} passed architecture checks.`);
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
 }

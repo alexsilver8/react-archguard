@@ -1,34 +1,113 @@
-# React Architecture Guard
+# react-archguard
 
-A strict TypeScript and `ts-morph` CLI for enforcing React component-file conventions in local and public repositories.
+`react-archguard` is a fast TypeScript and `ts-morph` CLI for enforcing strict React component-file conventions.
 
-## Run it
+Requires Node.js 20 or newer.
 
-Install dependencies and check the valid fixture:
+## Install once, use anywhere
+
+Install it globally:
+
+```sh
+npm install --global react-archguard
+```
+
+Then run it from any React repository:
+
+```sh
+react-archguard
+```
+
+You can also run it without a global install:
+
+```sh
+npx react-archguard
+```
+
+`react-guard` and `react-architecture-guard` remain available as compatibility aliases.
+
+## Usage
+
+By default, the CLI scans `src/components` and `src/features` for `*.tsx` component files:
+
+```sh
+react-archguard
+```
+
+Scan a specific component tree:
+
+```sh
+react-archguard --root src/features/agents/components
+```
+
+Useful options:
+
+```text
+-r, --root <path>  component tree to scan
+    --json         print a machine-readable report
+    --no-color     disable styled terminal output
+-q, --quiet       only print output when violations are found
+-v, --version     output the installed version
+-h, --help        display help for the command
+```
+
+The command exits with status `0` when the scan passes and status `1` when violations are found, so it works in CI, pre-commit hooks, and editor tasks. Use `--json` when another tool needs the result as structured data.
+
+## Releases and updates
+
+For the first release, publish the package once from your machine:
+
+```sh
+npm login
+npm publish --access public
+```
+
+After that first publish, configure npm Trusted Publishing for this repository and the `Publish npm package` workflow. Select GitHub Actions and use:
+
+```text
+Organization or user: alexsilver8
+Repository: react-archguard
+Workflow filename: publish.yml
+```
+
+Then create a release locally:
+
+```sh
+npm test
+npm version patch
+git push origin main --follow-tags
+```
+
+Use `minor` for backwards-compatible features or `major` for breaking changes. The tag starts the GitHub Actions workflow, which verifies and publishes the package. Users can update with:
+
+```sh
+npm install --global react-archguard@latest
+```
+
+The package uses npm's OIDC-based trusted publishing, so the workflow does not need a long-lived npm token.
+
+## Development
+
+Install dependencies and run the checker locally:
 
 ```sh
 npm install
 npm run check
 ```
 
-Build the CLI and run it directly:
+Build the distributable CLI:
 
 ```sh
 npm run build
-node ./dist/scripts/architecture/check-components.js
+node ./dist/scripts/architecture/cli.js
 ```
 
-When published, the command is available as `react-architecture-guard`.
-
-The checker scans `src/components/**/*.tsx` and feature-local `src/features/**/components/**/*.tsx` files by default. Use `--root` for another component tree:
+Run the automated checks:
 
 ```sh
-npm run check -- --root src/features/agents/components
+npm test
+npx tsc --noEmit
 ```
-
-Files ending in `.test.tsx`, `.spec.tsx`, or `.stories.tsx` are ignored.
-
-## Exercise failures
 
 The intentionally invalid fixtures demonstrate the expected non-zero failure:
 
@@ -36,18 +115,9 @@ The intentionally invalid fixtures demonstrate the expected non-zero failure:
 npm run check:invalid
 ```
 
-The test command also checks the checker programmatically:
-
-```sh
-npm test
-npx tsc --noEmit
-```
-
-Component files may contain imports and exactly one named exported function whose PascalCase name matches the kebab-case filename. Types, constants, helpers, additional components, and re-exports belong in neighboring files.
-
 ## What it enforces
 
-- Component files use kebab-case filenames, such as `user-card.tsx`.
+- Component filenames use kebab-case, such as `user-card.tsx`.
 - Each component folder contains an `index.ts` that explicitly re-exports the component.
 - The component name matches the filename in PascalCase, such as `UserCard`.
 - The component file contains exactly one named exported component function.
@@ -57,7 +127,7 @@ Component files may contain imports and exactly one named exported function whos
 - Constants and enums belong in `<component>.constants.ts`.
 - Helper functions belong in `<component>.utils.ts`.
 - Additional components, classes, schemas, variables, and unrelated top-level declarations are rejected.
-- Component files should live in a matching folder, such as `user-card/user-card.tsx`.
+- Component files live in a matching folder, such as `user-card/user-card.tsx`.
 - Test, spec, and Storybook files are ignored: `*.test.tsx`, `*.spec.tsx`, and `*.stories.tsx`.
 
 For example, `user-card/index.ts` must explicitly contain:
@@ -65,5 +135,3 @@ For example, `user-card/index.ts` must explicitly contain:
 ```ts
 export { UserCard } from './user-card';
 ```
-
-The command exits with a non-zero status when violations are found and prints each violation with its file, line number, explanation, and suggested destination.

@@ -1,14 +1,14 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-import chalk from 'chalk';
+import chalk, { type ChalkInstance } from 'chalk';
 
 import {
     COMPONENT_FILE_SUFFIXES,
     COMPONENT_ROOT_MARKERS,
     IGNORED_COMPONENT_FILE_SUFFIXES,
 } from './conventions.js';
-import type { ArchitectureViolation, CheckOptions } from './types.js';
+import type { ArchitectureViolation } from './types.js';
 
 export function isIgnoredComponentFile(filePath: string): boolean {
     return IGNORED_COMPONENT_FILE_SUFFIXES.some((suffix: string): boolean => filePath.endsWith(suffix));
@@ -55,45 +55,35 @@ export function createViolation(
     };
 }
 
-export function formatViolations(violations: readonly ArchitectureViolation[]): string {
+export function formatViolations(
+    violations: readonly ArchitectureViolation[],
+    color: ChalkInstance = chalk,
+): string {
     if (violations.length === 0) {
         return '';
     }
 
     const lines: string[] = [
         '',
-        chalk.red.bold('Architecture violations'),
-        chalk.gray('─'.repeat(64)),
+        color.red.bold('Architecture violations'),
+        color.gray('─'.repeat(64)),
     ];
 
     violations.forEach((violation: ArchitectureViolation, index: number): void => {
         lines.push('');
-        lines.push(`${chalk.yellow(violation.filePath)}${chalk.gray(`:${violation.line}`)}`);
-        lines.push(`  ${chalk.red.bold('✖')} ${chalk.red(violation.message)}`);
-        lines.push(`    ${chalk.cyan('↳')} ${chalk.gray(violation.suggestion)}`);
+        lines.push(`${color.yellow(violation.filePath)}${color.gray(`:${violation.line}`)}`);
+        lines.push(`  ${color.red.bold('✖')} ${color.red(violation.message)}`);
+        lines.push(`    ${color.cyan('↳')} ${color.gray(violation.suggestion)}`);
 
         if (index < violations.length - 1) {
-            lines.push(chalk.gray('·'.repeat(64)));
+            lines.push(color.gray('·'.repeat(64)));
         }
     });
 
     lines.push('');
-    lines.push(chalk.gray('─'.repeat(64)));
-    lines.push(chalk.red.bold(`✖ Found ${violations.length} architecture violation${violations.length === 1 ? '' : 's'}.`));
+    lines.push(color.gray('─'.repeat(64)));
+    lines.push(color.red.bold(`✖ Found ${violations.length} architecture violation${violations.length === 1 ? '' : 's'}.`));
     return lines.join('\n');
-}
-
-export function parseCheckOptions(args: readonly string[], cwd: string): CheckOptions {
-    const rootIndex: number = args.indexOf('--root');
-    const requestedRoot: string | undefined = rootIndex >= 0 ? args[rootIndex + 1] : undefined;
-    const projectRoot: string = resolve(cwd);
-
-    return {
-        projectRoot,
-        componentRoots: requestedRoot === undefined
-            ? ['src/components', 'src/features']
-            : [requestedRoot],
-    };
 }
 
 function isInsideComponentDirectory(filePath: string): boolean {

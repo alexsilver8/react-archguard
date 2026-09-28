@@ -1,9 +1,30 @@
 {
-    "name": "react-architecture-guard",
-    "version": "0.1.0",
-    "description": "A strict AST-based architecture guard for React component files.",
+    "name": "react-archguard",
+    "version": "0.2.0",
+    "description": "A polished AST-based CLI for enforcing React component-file conventions.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexsilver8/react-archguard.git"
+    },
+    "homepage": "https://github.com/alexsilver8/react-archguard#readme",
+    "keywords": [
+        "react",
+        "architecture",
+        "lint",
+        "cli",
+        "typescript"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=20"
+    },
     "bin": {
-        "react-architecture-guard": "./dist/scripts/architecture/check-components.js"
+        "react-archguard": "./dist/scripts/architecture/cli.js",
+        "react-guard": "./dist/scripts/architecture/cli.js",
+        "react-architecture-guard": "./dist/scripts/architecture/cli.js"
     },
     "files": [
         "dist"
@@ -11,13 +32,15 @@
     "type": "module",
     "scripts": {
         "build": "tsc",
-        "check": "tsx scripts/architecture/check-components.ts",
-        "check:invalid": "tsx scripts/architecture/check-components.ts --root fixtures/invalid2/src/components",
+        "check": "tsx scripts/architecture/cli.ts",
+        "check:invalid": "tsx scripts/architecture/cli.ts --root fixtures/invalid2/src/components",
         "test": "tsx scripts/architecture/test-checker.ts",
-        "prepublishOnly": "npm run build"
+        "prepack": "npm run build"
     },
     "dependencies": {
+        "boxen": "^8.0.1",
         "chalk": "^5.4.1",
+        "commander": "^14.0.3",
         "ts-morph": "^25.0.1"
     },
     "devDependencies": {
