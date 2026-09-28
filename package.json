@@ -35,6 +35,7 @@
         "check": "tsx scripts/architecture/cli.ts",
         "check:invalid": "tsx scripts/architecture/cli.ts --root fixtures/invalid2/src/components",
         "test": "tsx scripts/architecture/test-checker.ts",
+        "release": "npm version patch && git push origin main --follow-tags",
         "prepack": "npm run build"
     },
     "dependencies": {
