@@ -1,0 +1,28 @@
+{
+    "name": "react-architecture-guard",
+    "version": "0.1.0",
+    "description": "A strict AST-based architecture guard for React component files.",
+    "bin": {
+        "react-architecture-guard": "./dist/scripts/architecture/check-components.js"
+    },
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "check": "tsx scripts/architecture/check-components.ts",
+        "check:invalid": "tsx scripts/architecture/check-components.ts --root fixtures/invalid2/src/components",
+        "test": "tsx scripts/architecture/test-checker.ts",
+        "prepublishOnly": "npm run build"
+    },
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "ts-morph": "^25.0.1"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.10",
+        "tsx": "^4.19.4",
+        "typescript": "^5.8.3"
+    }
+}
