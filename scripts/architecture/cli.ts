@@ -150,6 +150,4 @@ function readPackageVersion(): string {
     return typeof packageJson.version === 'string' ? packageJson.version : '0.0.0';
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-    createProgram().parse();
-}
+createProgram().parse();
